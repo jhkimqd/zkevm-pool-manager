@@ -9,7 +9,7 @@ services:
     depends_on:
       zkevm-pool-db:
         condition: service_healthy
-    image: zkevm-pool-manager
+    image: hermeznetwork/zkevm-pool-manager
     deploy:
       resources:
         limits:

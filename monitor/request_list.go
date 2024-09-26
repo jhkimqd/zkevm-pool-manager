@@ -42,6 +42,7 @@ func (e *monitorRequestList) delete(request *monitorRequest) bool {
 	defer e.mutex.Unlock()
 
 	if request, found := e.list[request.l2Tx.Hash]; found {
+		log.Info("@@@@@@@@@@@@@@@@@@@@@@@11111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@, %s, %s", request.l2Tx.Hash, e.list[request.l2Tx.Hash])
 		sLen := len(e.sorted)
 		i := sort.Search(sLen, func(i int) bool {
 			return e.isGreaterOrEqualThan(request, e.list[e.sorted[i].l2Tx.Hash])
@@ -58,11 +59,26 @@ func (e *monitorRequestList) delete(request *monitorRequest) bool {
 
 			if e.sorted[i].nextRetry != request.nextRetry {
 				// we have a request with different (lower) nextRetry time than the request we are looking for, therefore we haven't found the request
-				log.Warnf("error deleting monitor request %s from monitoreRequestList, not found in the list of requests with same nextRetry time: %s", request.l2Tx.Hash)
+				log.Warnf("error deleting monitor request %s from monitoreRequestList, not found in the list of requests with same nextRetry time: %s", request.l2Tx.Hash, request.nextRetry)
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@22222222@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				log.Warnf("SORTED HASH is %s, REQUEST HASH is %s ", e.sorted[i].l2Tx.Hash, request.l2Tx.Hash)
+				log.Warnf("INDEX IS %s, LENGTH IS %s", i, sLen)
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@22222222@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				// request.nextRetry doesn't exist, break loop and delete it
+				// delete(e.list, request.l2Tx.Hash)
+				// delete(e.list, e.sorted[i].l2Tx.Hash)
 				return false
 			}
 
 			if e.sorted[i].l2Tx.Hash == request.l2Tx.Hash {
+				break
+			}
+
+			// This txn has expired
+			if e.sorted[i].l2Tx.Status == "expired" {
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				log.Warnf("TXN STATUS %s, ", e.sorted[i].l2Tx.Status)
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 				break
 			}
 

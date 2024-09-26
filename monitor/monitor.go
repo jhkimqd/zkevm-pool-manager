@@ -131,11 +131,14 @@ func (m *Monitor) checkMonitorRequestRetries() {
 			now := time.Now()
 			request := m.requestRetryList.getByIndex(0)
 			// Check if tx has reached max lifetime
+			if request.nextRetry.Before(now) && request.l2Tx.Status != "confirmed" {
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@00000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+			}
 			if request.l2Tx.ReceivedAt.Add(m.cfg.TxLifeTimeMax.Duration).Before(now) {
 				log.Debugf("monitor tx %s has expired, updating status", request.l2Tx.Hash)
 				m.poolDB.UpdateL2TransactionStatus(context.Background(), request.l2Tx.Hash, db.TxStatusExpired, "")
 				m.requestRetryList.delete(request)
-			} else if request.nextRetry.Before(now) {
+			} else if request.nextRetry.Before(now) && request.l2Tx.Status != "confirmed" && request.l2Tx.Status != "sent" {
 				log.Debugf("retry monitor tx %s that was schedule to %v", request.l2Tx.Hash, request.nextRetry)
 				m.requestRetryList.delete(request)
 				m.enqueueMonitorRequest(request)

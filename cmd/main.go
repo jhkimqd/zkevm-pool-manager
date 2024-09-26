@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"runtime"
@@ -61,6 +63,9 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+	go func() {
+		http.ListenAndServe("0.0.0.0:6060", nil)
+	}()
 }
 
 func start(cliCtx *cli.Context) error {
