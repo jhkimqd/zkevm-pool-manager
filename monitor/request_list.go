@@ -43,14 +43,14 @@ func (e *monitorRequestList) delete(request *monitorRequest) bool {
 
 	if request, found := e.list[request.l2Tx.Hash]; found {
 		log.Info("@@@@@@@@@@@@@@@@@@@@@@@11111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", request.l2Tx.Hash, e.list[request.l2Tx.Hash])
-		log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		delete(e.list, request.l2Tx.Hash)
-		log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		if request.l2Tx.Status == "sent" || request.l2Tx.Status == "confirmed" {
-			log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-			delete(e.list, request.l2Tx.Hash)
-			log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-		}
+		// log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		// delete(e.list, request.l2Tx.Hash)
+		// log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		// if request.l2Tx.Status == "sent" || request.l2Tx.Status == "confirmed" {
+		// 	log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		// 	delete(e.list, request.l2Tx.Hash)
+		// 	log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		// }
 		sLen := len(e.sorted)
 		i := sort.Search(sLen, func(i int) bool {
 			return e.isGreaterOrEqualThan(request, e.list[e.sorted[i].l2Tx.Hash])
