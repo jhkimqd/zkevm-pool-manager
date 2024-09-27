@@ -131,7 +131,9 @@ func (m *Monitor) checkMonitorRequestRetries() {
 			now := time.Now()
 			request := m.requestRetryList.getByIndex(0)
 			// Check if tx has reached max lifetime
-			if request.nextRetry.Before(now) && request.l2Tx.Status != "confirmed" {
+			if request.nextRetry.Before(now) && request.l2Tx.Status != "confirmed" && request.l2Tx.Status != "sent" {
+				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@00000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				log.Warnf("HASH: ", request.l2Tx.Hash)
 				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@00000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 			}
 			if request.l2Tx.ReceivedAt.Add(m.cfg.TxLifeTimeMax.Duration).Before(now) {

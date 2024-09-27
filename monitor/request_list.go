@@ -42,7 +42,15 @@ func (e *monitorRequestList) delete(request *monitorRequest) bool {
 	defer e.mutex.Unlock()
 
 	if request, found := e.list[request.l2Tx.Hash]; found {
-		log.Info("@@@@@@@@@@@@@@@@@@@@@@@11111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@, %s, %s", request.l2Tx.Hash, e.list[request.l2Tx.Hash])
+		log.Info("@@@@@@@@@@@@@@@@@@@@@@@11111111@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", request.l2Tx.Hash, e.list[request.l2Tx.Hash])
+		log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		delete(e.list, request.l2Tx.Hash)
+		log.Info("@@@@@@@@@@@@@@@@@@@@@@@66666666@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		if request.l2Tx.Status == "sent" || request.l2Tx.Status == "confirmed" {
+			log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+			delete(e.list, request.l2Tx.Hash)
+			log.Info("@@@@@@@@@@@@@@@@@@@@@@@55555555@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		}
 		sLen := len(e.sorted)
 		i := sort.Search(sLen, func(i int) bool {
 			return e.isGreaterOrEqualThan(request, e.list[e.sorted[i].l2Tx.Hash])
@@ -65,20 +73,17 @@ func (e *monitorRequestList) delete(request *monitorRequest) bool {
 				log.Warnf("INDEX IS %s, LENGTH IS %s", i, sLen)
 				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@22222222@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 				// request.nextRetry doesn't exist, break loop and delete it
-				// delete(e.list, request.l2Tx.Hash)
+				if e.sorted[i].l2Tx.Status == "expired" {
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+					log.Warnf("TXN STATUS %s, ", e.sorted[i].l2Tx.Status)
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
+				}
 				// delete(e.list, e.sorted[i].l2Tx.Hash)
 				return false
 			}
 
 			if e.sorted[i].l2Tx.Hash == request.l2Tx.Hash {
-				break
-			}
-
-			// This txn has expired
-			if e.sorted[i].l2Tx.Status == "expired" {
-				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-				log.Warnf("TXN STATUS %s, ", e.sorted[i].l2Tx.Status)
-				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@33333333@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 				break
 			}
 
