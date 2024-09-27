@@ -136,13 +136,22 @@ func (m *Monitor) checkMonitorRequestRetries() {
 				log.Warnf("HASH: ", request.l2Tx.Hash)
 				log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@00000000@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 			}
+			// Current Kurtosis config -> 300s (5m)
 			if request.l2Tx.ReceivedAt.Add(m.cfg.TxLifeTimeMax.Duration).Before(now) {
 				log.Debugf("monitor tx %s has expired, updating status", request.l2Tx.Hash)
 				m.poolDB.UpdateL2TransactionStatus(context.Background(), request.l2Tx.Hash, db.TxStatusExpired, "")
-				m.requestRetryList.delete(request)
+				if m.requestRetryList.delete(request) {
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@77777777@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+					log.Warnf("DELETE SUCCESSFUL: ", request.l2Tx.Hash)
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@77777777@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				}
 			} else if request.nextRetry.Before(now) && request.l2Tx.Status != "confirmed" && request.l2Tx.Status != "sent" {
 				log.Debugf("retry monitor tx %s that was schedule to %v", request.l2Tx.Hash, request.nextRetry)
-				m.requestRetryList.delete(request)
+				if m.requestRetryList.delete(request) {
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@88888888@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+					log.Warnf("DELETE SUCCESSFUL: ", request.l2Tx.Hash)
+					log.Warnf("@@@@@@@@@@@@@@@@@@@@@@@88888888@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+				}
 				m.enqueueMonitorRequest(request)
 			} else {
 				sleepTime := request.nextRetry.Sub(now)
